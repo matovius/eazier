@@ -1,0 +1,182 @@
+@layer variable, reset, base, components, utilities;
+
+@layer variables {
+	:root {
+		/* TYPOGRAPHY */
+		/* Font families */
+		/* NOTE: Remember that we can only use the 400 and 500 weight values of DM Mono */
+		--font-dm-mono: 'DM Mono', monospace;
+		/* Typescale */
+		--text-sm: clamp(0.8rem, -0.02vi + 0.8rem, 0.79rem);
+		--text-base: clamp(1rem, 0vi + 1rem, 1rem);
+		--text-md: clamp(1.25rem, 0.02vi + 1.24rem, 1.26rem);
+		--text-lg: clamp(1.56rem, 0.06vi + 1.55rem, 1.59rem);
+		--text-xl: clamp(1.95rem, 0.11vi + 1.93rem, 2rem);
+		--text-xxl: clamp(2.44rem, 0.19vi + 2.4rem, 2.52rem);
+		--text-xxxl: clamp(3.05rem, 0.3vi + 2.99rem, 3.18rem);
+		/* COLORS */
+		--color-white: #ffffff;
+		--color-black: #000000;
+		/* Jasmine = #F6D973 = oklch(0.8891 0.1261 93.81) */
+		--color-jasmine: oklch(0.8891 0.1261 93.81);
+		/* Wild Strawberry = #EC458D = oklch(0.6492 0.2105 358.57) */
+		--color-wild-strawberry: oklch(0.6492 0.2105 358.57);
+		/* Bubblegum Pink = #EF476F = */
+		--color-bubblegum-pink: #ef476f;
+		/* Raspberry = #E11444*/
+		--color-raspberry: #e11444;
+		/* Palettes */
+		--color-neutral-50: color-mix(in oklab, var(--color-white), var(--color-black) 5%);
+		--color-neutral-100: color-mix(in oklab, var(--color-white), var(--color-black) 10%);
+		--color-neutral-200: color-mix(in oklab, var(--color-white), var(--color-black) 20%);
+		--color-neutral-300: color-mix(in oklab, var(--color-white), var(--color-black) 30%);
+		--color-neutral-400: color-mix(in oklab, var(--color-white), var(--color-black) 40%);
+		--color-neutral-500: color-mix(in oklab, var(--color-white), var(--color-black) 50%);
+		--color-neutral-600: color-mix(in oklab, var(--color-white), var(--color-black) 60%);
+		--color-neutral-700: color-mix(in oklab, var(--color-white), var(--color-black) 70%);
+		--color-neutral-800: color-mix(in oklab, var(--color-white), var(--color-black) 80%);
+		--color-neutral-900: color-mix(in oklab, var(--color-white), var(--color-black) 90%);
+		--color-neutral-950: color-mix(in oklab, var(--color-white), var(--color-black) 95%);
+		/* Gradients */
+		/* JASBERRY = Jasmine + Wild Strawberry */
+		--gradient-jasberry: linear-gradient(45deg, var(--color-jasmine), var(--color-wild-strawberry));
+	}
+}
+
+@layer reset {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+		padding: 0;
+		margin: 0;
+	}
+	body {
+		line-height: 1.5;
+		-webkit-font-smoothing: antialiased;
+	}
+	img,
+	picture,
+	video,
+	canvas,
+	svg {
+		display: block;
+		max-width: 100%;
+	}
+	input,
+	button,
+	textarea,
+	select {
+		font: inherit;
+	}
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		overflow-wrap: break-word;
+	}
+}
+
+@layer base {
+	*,
+	*::before,
+	*::after {
+		transition: all 200ms ease-out;
+	}
+
+	body {
+		font-family: var(--font-dm-mono);
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-weight: 500;
+	}
+
+	h1 {
+		font-size: var(--text-xxxl);
+		line-height: 1;
+	}
+	h2 {
+		font-size: var(--text-xxl);
+		line-height: 1;
+	}
+	h3 {
+		font-size: var(--text-xl);
+		line-height: 1.2;
+	}
+	h4 {
+		font-size: var(--text-lg);
+		line-height: 1.2;
+	}
+	h5 {
+		font-size: var(--text-md);
+		line-height: 1.4;
+	}
+	h6 {
+		font-size: var(--text-base);
+		line-height: 1;
+	}
+	p {
+		font-size: var(--text-base);
+		line-height: 1.5;
+	}
+	small {
+		font-size: var(--text-sm);
+		font-weight: 500;
+		line-height: 1.5;
+	}
+	span {
+		font: inherit;
+	}
+}
+
+@layer components {
+}
+
+@layer utilities {
+	.h1 {
+		font-size: var(--text-xxxl);
+		line-height: 1;
+	}
+	.h2 {
+		font-size: var(--text-xxl);
+		line-height: 1;
+	}
+	.h3 {
+		font-size: var(--text-xl);
+		line-height: 1.2;
+	}
+	.h4 {
+		font-size: var(--text-lg);
+		line-height: 1.2;
+	}
+	.h5 {
+		font-size: var(--text-md);
+		line-height: 1.4;
+	}
+	.h6 {
+		font-size: var(--text-base);
+		line-height: 1;
+	}
+	.p {
+		font-size: var(--text-base);
+		line-height: 1.5;
+	}
+	.small {
+		font-size: var(--text-sm);
+		font-weight: 500;
+		line-height: 1.5;
+	}
+
+	.fix-z-index {
+		isolation: isolate;
+	}
+}
