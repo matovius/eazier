@@ -1,6 +1,4 @@
 <script>
-	import { onMount } from 'svelte';
-
 	/**
 	 * @typedef Coords Cartesian co-ordinates of a point
 	 * @prop { number } x The x position of a point
@@ -128,11 +126,6 @@
 			return;
 		}
 	}
-	onMount(() => {
-		// if (GraphContainer) {
-		// 	graphScale = GraphContainer.clientWidth / 400;
-		// }
-	});
 </script>
 
 <svelte:head>
@@ -251,43 +244,6 @@
 							</g>
 						</g>
 					</svg>
-					<!-- GRAPH CONTROLS -->
-					<div class="graph-controls">
-						<button
-							class="p1"
-							style="--_x: {P1Control.position.x}; --_y: {P1Control.position.y};"
-							bind:this={P1Control.ref}
-							onmousedown={() => {
-								P1Control.isReadyToDrag = true;
-							}}
-							onmouseup={() => {
-								P1Control.isReadyToDrag = false;
-							}}
-						>
-							<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
-								<title>Control Point 1</title>
-								<circle cx="5" cy="5" r="5" fill="var(--color-neutral-800)" />
-								<circle cx="5" cy="5" r="2.5" fill="var(--color-white)" />
-							</svg>
-						</button>
-						<button
-							class="p2"
-							style="--_x: {P2Control.position.x}; --_y: {P2Control.position.y};"
-							bind:this={P2Control.ref}
-							onmousedown={() => {
-								P2Control.isReadyToDrag = true;
-							}}
-							onmouseup={() => {
-								P2Control.isReadyToDrag = false;
-							}}
-						>
-							<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
-								<title>Control Point 2</title>
-								<circle cx="5" cy="5" r="5" fill="var(--color-neutral-800)" />
-								<circle cx="5" cy="5" r="2.5" fill="var(--color-white)" />
-							</svg>
-						</button>
-					</div>
 				</div>
 				<div class="positions">
 					<p>P1: x {P1Control.position.x}, y {P1Control.position.y}</p>
@@ -353,56 +309,6 @@
 
 		&:active {
 			cursor: grabbing;
-		}
-	}
-	.graph-controls {
-		transition: none;
-		button {
-			display: none;
-			border-radius: 50%;
-			border: none;
-			background-color: transparent;
-			cursor: grab;
-			position: absolute;
-			inset-block-start: var(--_y);
-			inset-inline-start: var(--_x);
-			margin-inline-start: -15px;
-			margin-block-start: -15px;
-			/*transform: translate(var(--_x), var(--_y));*/
-			/*will-change: transform;*/
-
-			&:active {
-				cursor: grabbing;
-			}
-
-			/*&.p1 {
-				inset-block-start: 100%;
-				margin-inline-start: -15px;
-				margin-block-start: -15px;
-			}
-
-			&.p2 {
-				inset-inline-start: 100%;
-				margin-block-start: -15px;
-				margin-inline-start: -15px;
-			}*/
-
-			svg {
-				min-width: 30px;
-				width: 30px;
-				height: 30px;
-				overflow: visible;
-			}
-		}
-	}
-
-	@keyframes wiggle {
-		0%,
-		100% {
-			transform: translateX(0);
-		}
-		50% {
-			transform: translateX(-25vw);
 		}
 	}
 </style>
