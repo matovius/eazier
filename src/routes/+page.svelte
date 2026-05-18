@@ -1,131 +1,79 @@
 <script>
-	/**
-	 * @typedef Coords Cartesian co-ordinates of a point
-	 * @prop { number } x The x position of a point
-	 * @prop { number } y The y position of a point
-	 */
+	import { browser } from '$app/environment';
+	import BezierGraph from '$components/Graph/BezierGraph.svelte';
+	// import GraphInput from '$components/Graph/GraphInput.svelte';
+	import { onMount } from 'svelte';
 
-	/**
-	 * @typedef GraphCoords The positions of the two cubic bezier control points
-	 * @prop { Coords } p1 The coordinate positions of the first point
-	 * @prop { Coords } p2 The coordinate position of the second point
-	 */
-
-	/**
-	 * @typedef Control A control point and it's associated data
-	 * @prop { Coords } position The offset position of the button on the graph
-	 * @prop { boolean } isReadyToDrag Indicates whether the button is ready to drag on the graph
-	 */
-
-	/** @type { HTMLElement | null } */
-	let GraphContainer = $state(null);
-	/** @type { Control } */
-	let P1Control = $state({
-		position: {
-			x: 0,
-			y: 400
-		},
-		isReadyToDrag: false
+	/** @type { GraphCoords } */
+	let graphCoords = $state({
+		p1: { x: 0, y: 0 },
+		p2: { x: 0, y: 0 }
 	});
-	/** @type { Control } */
-	let P2Control = $state({
-		position: {
-			x: 400,
-			y: 0
+	// $inspect(graphCoords.p1, graphCoords.p2);
+	/** @type { GraphCoords } */
+	let bezierCoords = $derived({
+		p1: {
+			x: Number((graphCoords.p1.x / 400).toPrecision(2)),
+			y: Number(((400 - graphCoords.p1.y) / 400).toPrecision(2))
 		},
-		isReadyToDrag: false
+		p2: {
+			x: Number((graphCoords.p2.x / 400).toPrecision(2)),
+			y: Number(((400 - graphCoords.p2.y) / 400).toPrecision(2))
+		}
 	});
 	/** @type { GraphCoords } */
-	let graphCoords = $derived.by(() => {
-		if (GraphContainer) {
-			return {
-				p1: {
-					x: Number((P1Control.position.x / GraphContainer.clientWidth).toPrecision(2)),
-					y: Number((P1Control.position.y / GraphContainer.clientWidth).toPrecision(2))
-				},
-				p2: {
-					x: Number((P2Control.position.x / GraphContainer.clientWidth).toPrecision(2)),
-					y: Number((P2Control.position.y / GraphContainer.clientWidth).toPrecision(2))
-				}
-			};
+	let inputCoords = $state({
+		p1: {
+			x: 0,
+			y: 0
+		},
+		p2: {
+			x: 0,
+			y: 0
 		}
-		return {
-			p1: { x: 0, y: 0 },
-			p2: { x: 0, y: 0 }
-		};
 	});
+	/** @type { boolean } */
+	let isCodeCopied = $state(false);
+	/** @type { PreviewMode } */
+	let previewMode = $state('position');
+	/** @type { number } */
+	let animationDuration = $state(1000);
+	/** @type { boolean } */
+	let isAnimationPlaying = $state(false);
 
-	/**
-	 * Handle the movement of P1
-	 * @param { MouseEvent } ev The corresponding mouse event
-	 */
-	function handleP1Movement(ev) {
-		if (GraphContainer) {
-			/** @type { Coords } */
-			let p1 = { x: ev.offsetX, y: ev.offsetY };
-
-			if (p1.x < 0) {
-				p1.x = 0;
-			} else if (p1.x > 400) {
-				p1.x = 400;
-			}
-
-			if (p1.y < -100) {
-				p1.y = -100;
-			} else if (p1.y > 500) {
-				p1.y = 500;
-			}
-
-			P1Control.position = {
-				x: p1.x,
-				y: p1.y
-			};
+	function copyCode() {
+		if (browser) {
+			navigator.clipboard.writeText(
+				`cubic-bezier(${bezierCoords.p1.x}, ${bezierCoords.p1.y}, ${bezierCoords.p2.x}, ${bezierCoords.p2.y})`
+			);
+			isCodeCopied = true;
+			setTimeout(() => {
+				isCodeCopied = false;
+			}, 2000);
 		}
 	}
 
-	/**
-	 * Handle the movement of P2
-	 * @param { MouseEvent } ev The corresponding mouse event
-	 */
-	function handleP2Movement(ev) {
-		if (GraphContainer) {
-			/** @type { Coords } */
-			let p2 = { x: ev.offsetX, y: ev.offsetY };
-
-			if (p2.x < 0) {
-				p2.x = 0;
-			} else if (p2.x > 400) {
-				p2.x = 400;
-			}
-
-			if (p2.y < -100) {
-				p2.y = -100;
-			} else if (p2.y > 500) {
-				p2.y = 500;
-			}
-
-			P2Control.position = {
-				x: p2.x,
-				y: p2.y
-			};
-		}
+	function updateCoords() {
+		inputCoords = bezierCoords;
 	}
 
-	/**
-	 * Handle dragging of controls
-	 * @param { MouseEvent } ev The corresponding mouse event
-	 */
-	function handleDragMovement(ev) {
-		if (P1Control.isReadyToDrag) {
-			ev.stopPropagation();
-			handleP1Movement(ev);
-		} else if (P2Control.isReadyToDrag) {
-			ev.stopPropagation();
-			handleP2Movement(ev);
-		} else {
-			return;
-		}
+	/** @type { () => void } */
+	function handleInput() {
+		graphCoords = {
+			p1: {
+				x: inputCoords.p1.x * 400,
+				y: (inputCoords.p1.y * 400 - 400) * -1
+			},
+			p2: {
+				x: inputCoords.p2.x * 400,
+				y: (inputCoords.p2.y * 400 - 400) * -1
+			}
+		};
 	}
+
+	onMount(() => {
+		inputCoords = bezierCoords;
+	});
 </script>
 
 <svelte:head>
@@ -143,127 +91,198 @@
 <main>
 	<div class="container">
 		<div class="pane one">
-			<section id="graph" class="graph">
-				<h1 class="h5">Graph</h1>
-				<div class="graph-container" bind:this={GraphContainer} onmousemove={handleDragMovement}>
-					<!-- GRAPH DISPLAY -->
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 400 400"
-						class="graph-svg"
-						stroke-linecap="round"
-					>
-						<g id="grid">
-							<g id="vertical">
-								<line id="grid-line" x1="0" y1="0" x2="0" y2="400" />
-								<line id="grid-line" x1="100" y1="0" x2="100" y2="400" />
-								<line id="grid-line" x1="200" y1="0" x2="200" y2="400" />
-								<line id="grid-line" x1="300" y1="0" x2="300" y2="400" />
-								<line id="grid-line" x1="400" y1="0" x2="400" y2="400" />
-							</g>
-							<g id="horizontal">
-								<line id="grid-line" x1="0" y1="0" x2="400" y2="0" />
-								<line id="grid-line" x1="0" y1="100" x2="400" y2="100" />
-								<line id="grid-line" x1="0" y1="200" x2="400" y2="200" />
-								<line id="grid-line" x1="0" y1="300" x2="400" y2="300" />
-								<line id="grid-line" x1="0" y1="400" x2="400" y2="400" />
-							</g>
-						</g>
-						<line id="linear-normal" x1="0" y1="400" x2="400" y2="0" stroke-dasharray="16" />
-						<path
-							d="M 0,400 C {P1Control.position.x},{P1Control.position.y} {P2Control.position
-								.x},{P2Control.position.y} 400,0"
-							fill="none"
-							stroke="var(--color-neutral-800)"
-							stroke-width="8"
-						/>
-						<g id="control-points">
-							<g id="lines">
-								<line
-									id="p1-line"
-									x1="0"
-									y1="400"
-									x2={P1Control.position.x}
-									y2={P1Control.position.y}
-									stroke="var(--color-neutral-800)"
-									stroke-width="2"
-								/>
-								<line
-									id="p2-line"
-									x1="400"
-									y1="0"
-									x2={P2Control.position.x}
-									y2={P2Control.position.y}
-									stroke="var(--color-neutral-800)"
-									stroke-width="2"
-								/>
-							</g>
-							<g
-								id="p1"
-								onmousedown={() => {
-									P1Control.isReadyToDrag = true;
-								}}
-								onmouseup={() => {
-									P1Control.isReadyToDrag = false;
-								}}
-							>
-								<circle
-									cx={P1Control.position.x}
-									cy={P1Control.position.y}
-									r="15"
-									fill="var(--color-neutral-800)"
-								/>
-								<circle
-									cx={P1Control.position.x}
-									cy={P1Control.position.y}
-									r="7.5"
-									fill="var(--color-white)"
-								/>
-							</g>
-							<g
-								id="p2"
-								onmousedown={() => {
-									P2Control.isReadyToDrag = true;
-								}}
-								onmouseup={() => {
-									P2Control.isReadyToDrag = false;
-								}}
-							>
-								<circle
-									cx={P2Control.position.x}
-									cy={P2Control.position.y}
-									r="15"
-									fill="var(--color-neutral-800)"
-								/>
-								<circle
-									cx={P2Control.position.x}
-									cy={P2Control.position.y}
-									r="7.5"
-									fill="var(--color-white)"
-								/>
-							</g>
-						</g>
-					</svg>
-				</div>
-				<div class="positions">
-					<p>P1: x {P1Control.position.x}, y {P1Control.position.y}</p>
-					<p>P2: x {P2Control.position.x}, y {P2Control.position.y}</p>
-					<p>
-						Graph coords: x1 {graphCoords.p1.x}, y1 {graphCoords.p1.y}, x2 {graphCoords.p2.x}, y2 {graphCoords
-							.p2.y}
-					</p>
-				</div>
-			</section>
+			{@render Graph()}
+		</div>
+		<div class="pane two">
+			{@render Code()}
+			{@render Preview()}
+			<!-- {@render Library()} -->
 		</div>
 	</div>
 </main>
 
+<div class="non-desktop-overlay">
+	<h2 class="h1 heading">Apologies!</h2>
+	<p>
+		This app is currently unable to be used on non-desktop devices
+		<!-- with a screen less than 1034px
+		wide. -->
+	</p>
+</div>
+
+{#snippet Graph()}
+	<section id="graph" class="graph">
+		<div class="header">
+			<h2 class="heading h5">Graph</h2>
+		</div>
+		<!-- BEZIER GRAPH -->
+		<BezierGraph bind:coords={graphCoords} update={updateCoords} />
+		<!-- <div class="positions">
+					<p>
+						Graph coords: x1 {bezierCoords.p1.x}, y1 {bezierCoords.p1.y}, x2 {bezierCoords.p2.x}, y2 {bezierCoords
+							.p2.y}
+					</p>
+				</div> -->
+		<div class="input-controls">
+			<div class="labels">
+				<label for="x1">x1</label>
+				<label for="y1">y1</label>
+				<label for="x2">x2</label>
+				<label for="y2">y2</label>
+			</div>
+			<div class="inputs">
+				<input
+					type="number"
+					id="x1"
+					class="graph-input"
+					min="0"
+					max="1"
+					step="0.01"
+					oninput={handleInput}
+					bind:value={inputCoords.p1.x}
+				/>
+				<input
+					type="number"
+					id="y1"
+					class="graph-input"
+					min="0"
+					max="1"
+					step="0.01"
+					oninput={handleInput}
+					bind:value={inputCoords.p1.y}
+				/>
+				<input
+					type="number"
+					id="x2"
+					class="graph-input"
+					min="0"
+					max="1"
+					step="0.01"
+					oninput={handleInput}
+					bind:value={inputCoords.p2.x}
+				/>
+				<input
+					type="number"
+					id="y2"
+					class="graph-input"
+					min="0"
+					max="1"
+					step="0.01"
+					oninput={handleInput}
+					bind:value={inputCoords.p2.y}
+				/>
+			</div>
+		</div>
+	</section>
+{/snippet}
+
+{#snippet Code()}
+	<section id="code" class="code">
+		<div class="header">
+			<h2 class="heading h5">Code</h2>
+			<button class="btn">Info</button>
+		</div>
+		<output class="code-output">
+			<span class="start">cubic-bezier(</span>
+			<span class="x1">{bezierCoords.p1.x},</span>
+			<span class="y1"> {bezierCoords.p1.y},</span>
+			<span class="x2"> {bezierCoords.p2.x},</span>
+			<span class="y2"> {bezierCoords.p2.y}</span>
+			<span class="end">)</span>
+		</output>
+		<div class="ctas">
+			<button class="btn" class:swap={isCodeCopied} disabled={isCodeCopied} onclick={copyCode}>
+				<div class="swappable">
+					<span class="first">Copy</span>
+					<span class="second">Copied</span>
+				</div>
+			</button>
+			<!-- <button class="btn">Save</button> -->
+		</div>
+	</section>
+{/snippet}
+
+{#snippet Preview()}
+	<section id="preview" class="preview">
+		<div class="header">
+			<h2 class="heading h5">Preview</h2>
+			<label for="mode" class="mode-switcher">
+				<small>Mode</small>
+				<select name="mode" id="mode" bind:value={previewMode}>
+					<option value="position">Position</option>
+					<option value="rotation">Rotation</option>
+					<option value="size">Size</option>
+					<option value="opacity">Opacity</option>
+				</select>
+			</label>
+		</div>
+		<div class="animation-area">
+			<div
+				class="animatable-object {previewMode}"
+				style="
+				--_state: {isAnimationPlaying ? 'running' : 'paused'};
+				--_mode: {previewMode};
+				--_duration: {animationDuration}ms;
+				--_curve: cubic-bezier({bezierCoords.p1.x}, {bezierCoords.p1.y}, {bezierCoords.p2.x}, {bezierCoords
+					.p2.y});
+				"
+			></div>
+		</div>
+		<div class="footer">
+			<button
+				class="btn"
+				class:swap={isAnimationPlaying}
+				onclick={() => {
+					isAnimationPlaying = !isAnimationPlaying;
+				}}
+			>
+				<div class="swappable">
+					<span class="first">Play</span>
+					<span class="second">Pause</span>
+				</div>
+			</button>
+			<label for="duration">
+				<small>Duration (ms)</small>
+				<input
+					type="number"
+					class="duration-input"
+					name="duration"
+					id="duration"
+					min="100"
+					max="5000"
+					step="50"
+					bind:value={animationDuration}
+				/>
+			</label>
+		</div>
+	</section>
+{/snippet}
+
+{#snippet Library()}
+	<section id="library" class="library">
+		<div class="header">
+			<h2 class="heading h5">Library</h2>
+			<div class="library-search">
+				<button class="btn">Search</button>
+			</div>
+		</div>
+		<div class="library-container"></div>
+	</section>
+{/snippet}
+
 <style>
+	.non-desktop-overlay {
+		display: none;
+	}
+
 	header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		padding: 0.75rem;
+		background-color: var(--color-white);
+		position: sticky;
+		top: 0;
 	}
 
 	main {
@@ -271,44 +290,228 @@
 
 		> .container {
 			max-width: 1000px;
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 48px;
 			margin-inline: auto;
 		}
+	}
 
-		.graph-container {
-			min-width: 400px;
-			width: 400px;
-			max-width: 400px;
-			position: relative;
+	.pane.two {
+		display: flex;
+		flex-direction: column;
+		gap: 48px;
+		/*height: 300vh;*/
+	}
+
+	section {
+		display: grid;
+		gap: 24px;
+
+		> .header {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+
+			> .heading {
+				text-transform: uppercase;
+			}
+		}
+
+		> .footer {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
 		}
 	}
 
 	section.graph {
+		max-width: 400px;
+		position: sticky;
+		top: 80px;
+	}
+
+	.input-controls {
 		display: grid;
-		gap: 12px;
-	}
+		gap: 4px;
+		padding-block-start: 24px;
 
-	svg.graph-svg {
-		overflow: visible;
-
-		line#grid-line {
-			stroke: var(--color-neutral-100);
-			stroke-width: 1px;
+		> .labels,
+		> .inputs {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
 		}
-		line#linear-normal {
-			stroke: var(--color-neutral-200);
-			stroke-width: 1px;
+
+		> .labels {
+			font-size: var(--text-sm);
+			color: var(--color-neutral-500);
+
+			> label {
+				padding-inline-start: 12px;
+			}
+		}
+
+		> .inputs {
+			border: 1px solid var(--color-neutral-100);
+			isolation: isolate;
+
+			> input {
+				padding-block: 4px;
+				padding-inline: 12px;
+				border: none;
+				border-radius: 0;
+				outline: 2px solid transparent;
+
+				&:not(:nth-child(1)) {
+					border-inline-start: 1px solid var(--color-neutral-100);
+				}
+
+				&:focus {
+					outline-color: var(--color-neutral-800);
+					z-index: 1;
+				}
+			}
 		}
 	}
 
-	g#control-points * {
-		transition: none;
+	section.code {
+		> .code-output {
+			display: inline-flex;
+			padding-block: 8px;
+			padding-inline: 12px;
+			border: 1px solid var(--color-neutral-100);
+		}
 	}
-	g#control-points > g#p1,
-	g#control-points > g#p2 {
-		cursor: grab;
 
-		&:active {
-			cursor: grabbing;
+	section.preview {
+		label > small {
+			color: var(--color-neutral-500);
+		}
+		> .animation-area {
+			padding: 24px;
+			border: 1px solid var(--color-neutral-100);
+
+			> .animatable-object {
+				width: 50px;
+				height: 50px;
+				background-color: var(--color-neutral-800);
+				animation-name: var(--_mode);
+				animation-duration: var(--_duration);
+				animation-timing-function: var(--_curve);
+				animation-play-state: var(--_state);
+				animation-iteration-count: infinite;
+				animation-direction: alternate;
+
+				&.position {
+					animation-name: position;
+				}
+			}
+		}
+
+		input.duration-input {
+			width: 6em;
+			padding-block: 4px;
+			padding-inline: 12px;
+			border-radius: 0;
+			border: 1px solid var(--color-neutral-100);
+			outline: 2px solid transparent;
+
+			&:focus {
+				outline-color: var(--color-neutral-800);
+			}
+		}
+	}
+
+	button.btn {
+		&:has(.swappable) {
+			overflow: clip;
+		}
+		> .swappable {
+			display: inline-grid;
+
+			> span {
+				grid-area: 1 / 1 / 2 / 2;
+
+				&.first {
+					transform: translateY(0);
+					opacity: 1;
+				}
+				&.second {
+					transform: translateY(50%);
+					opacity: 0;
+				}
+			}
+		}
+		&.swap {
+			> .swappable > span {
+				transition-timing-function: cubic-bezier(0.12, 0.51, 0.46, 1.1);
+
+				&.first {
+					transform: translateY(-50%);
+					opacity: 0;
+				}
+				&.second {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	.mode-switcher {
+		> select {
+			padding-block: 4px;
+			padding-inline: 12px;
+			border: 1px solid var(--color-neutral-100);
+			background-color: transparent;
+			cursor: pointer;
+			outline: 2px solid transparent;
+
+			&:hover {
+				border-color: var(--color-neutral-500);
+			}
+			&:focus-visible {
+				outline-color: var(--color-neutral-800);
+			}
+		}
+	}
+
+	@media screen and (width < 1034px) {
+		header {
+			display: none;
+		}
+		main {
+			display: none;
+		}
+		.non-desktop-overlay {
+			width: 100vw;
+			height: 100dvh;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 24px;
+			padding: 24px;
+
+			> .heading {
+				color: var(--color-neutral-500);
+			}
+
+			> p {
+				text-align: center;
+				max-width: 600px;
+			}
+		}
+	}
+
+	@keyframes position {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(450px);
 		}
 	}
 </style>
