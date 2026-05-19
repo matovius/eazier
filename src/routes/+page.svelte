@@ -1,6 +1,7 @@
 <script>
 	import { browser } from '$app/environment';
 	import BezierGraph from '$components/Graph/BezierGraph.svelte';
+	import Modal from '$components/overlays/Modal.svelte';
 	// import GraphInput from '$components/Graph/GraphInput.svelte';
 	import { onMount } from 'svelte';
 
@@ -40,6 +41,10 @@
 	let animationDuration = $state(1000);
 	/** @type { boolean } */
 	let isAnimationPlaying = $state(false);
+	/** @type { boolean } */
+	let isGuideOpen = $state(false);
+	/** @type { boolean } */
+	let isAboutOpen = $state(false);
 
 	function copyCode() {
 		if (browser) {
@@ -81,11 +86,81 @@
 </svelte:head>
 
 <header>
-	<h1 class="h5">Eazier</h1>
-	<div class="side end">
-		<button class="btn">Guide</button>
-		<button class="btn">About</button>
+	<div class="side start">
+		<h1 class="h5">Eazier</h1>
 	</div>
+	<div class="side end">
+		<button
+			class="btn"
+			onclick={() => {
+				isGuideOpen = true;
+			}}>Guide <kbd>G</kbd></button
+		>
+		<button
+			class="btn"
+			onclick={() => {
+				isAboutOpen = true;
+			}}>About <kbd>A</kbd></button
+		>
+	</div>
+	<Modal bind:open={isGuideOpen} heading="Guide">
+		<p>This app is a minimal interface for constructing custom CSS cubic-beziers.</p>
+		<br />
+		<p>
+			On the left side is the graph, a cartesian system with hooks that you can move around with
+			your pointing device to manipulate the shape of the curve. Underneath that is a group of
+			number inputs that can also be used to do more precise geometry.
+		</p>
+		<br />
+		<p>
+			On the right is a code output that displays what your easing curve will look like, and a copy
+			button to easily take it and add it to your code.
+		</p>
+		<br />
+		<p>
+			Underneath the code output is the preview section, where you can preview a sample animation
+			that uses the values of your constructed curve to show how it would look like in select modes
+			and running at certain durations.
+		</p>
+		<br />
+		<p>
+			I'm working to create a library of easings, with a great set of defaults. You will also be
+			able to add your own custom-made easings. All saved locally in your browser.
+		</p>
+		<br />
+		<p>
+			Everything is hopefully clearly marked, and if you find a problem, you may create an issue on
+			<a
+				href="https://github.com/matovius/eazier"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="link">GitHub</a
+			>.
+		</p>
+	</Modal>
+	<Modal bind:open={isAboutOpen} heading="About">
+		<p>
+			Eazier (read <em>easy-yay</em>, a combination of <strong>easing</strong> and
+			<strong>bezier</strong>, or you can just call it "easier", you do you) is an app for creating
+			custom cubic-bezier easing curves.
+		</p>
+		<br />
+		<p>
+			It is a project by <a
+				href="https://matovius.dev"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="link">@matovius</a
+			>
+			since the year 2026. Check out the repo on
+			<a
+				href="https://github.com/matovius/eazier"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="link">GitHub</a
+			>.
+		</p>
+	</Modal>
 </header>
 
 <main>
@@ -180,7 +255,7 @@
 	<section id="code" class="code">
 		<div class="header">
 			<h2 class="heading h5">Code</h2>
-			<button class="btn">Info</button>
+			<!-- <button class="btn">Info</button> -->
 		</div>
 		<output class="code-output">
 			<span class="start">cubic-bezier(</span>
