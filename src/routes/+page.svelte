@@ -48,6 +48,9 @@
 
 	function copyCode() {
 		if (browser) {
+			if (isCodeCopied) {
+				return;
+			}
 			navigator.clipboard.writeText(
 				`cubic-bezier(${bezierCoords.p1.x}, ${bezierCoords.p1.y}, ${bezierCoords.p2.x}, ${bezierCoords.p2.y})`
 			);
@@ -76,6 +79,36 @@
 		};
 	}
 
+	/** @type { (ev: KeyboardEvent) => void } */
+	function handleKeyboardShortcuts(ev) {
+		switch (ev.key) {
+			case 'g':
+				ev.preventDefault();
+				if (isAboutOpen) {
+					isAboutOpen = false;
+				}
+				isGuideOpen = true;
+				break;
+			case 'a':
+				ev.preventDefault();
+				if (isGuideOpen) {
+					isGuideOpen = false;
+				}
+				isAboutOpen = true;
+				break;
+			case 'c':
+				ev.preventDefault();
+				copyCode();
+				break;
+			case 'p':
+				ev.preventDefault();
+				isAnimationPlaying = !isAnimationPlaying;
+				break;
+			default:
+				return;
+		}
+	}
+
 	onMount(() => {
 		inputCoords = bezierCoords;
 	});
@@ -84,6 +117,8 @@
 <svelte:head>
 	<title>Eazier - CSS Cubic Bezier Generator</title>
 </svelte:head>
+
+<svelte:window onkeydown={handleKeyboardShortcuts} />
 
 <header>
 	<div class="side start">
@@ -266,11 +301,12 @@
 			<span class="end">)</span>
 		</output>
 		<div class="ctas">
-			<button class="btn" class:swap={isCodeCopied} disabled={isCodeCopied} onclick={copyCode}>
+			<button class="btn" class:swap={isCodeCopied} onclick={copyCode}>
 				<div class="swappable">
 					<span class="first">Copy</span>
 					<span class="second">Copied</span>
 				</div>
+				<kbd>C</kbd>
 			</button>
 			<!-- <button class="btn">Save</button> -->
 		</div>
@@ -315,6 +351,7 @@
 					<span class="first">Play</span>
 					<span class="second">Pause</span>
 				</div>
+				<kbd>P</kbd>
 			</button>
 			<label for="duration">
 				<small>Duration (ms)</small>
