@@ -1,9 +1,12 @@
 <script>
+	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import BezierGraph from '$components/Graph/BezierGraph.svelte';
 	import Modal from '$components/overlays/Modal.svelte';
 	// import GraphInput from '$components/Graph/GraphInput.svelte';
-	import { onMount } from 'svelte';
+	import graphScreenie from '$lib/assets/graph-screenie.jpg';
+	import codeOutputScreenie from '$lib/assets/code-output-screenie.jpg';
+	import animationPreviewScreenie from '$lib/assets/animation-preview-screenie.jpg';
 
 	/** @type { GraphCoords } */
 	let graphCoords = $state({
@@ -87,14 +90,14 @@
 				if (isAboutOpen) {
 					isAboutOpen = false;
 				}
-				isGuideOpen = true;
+				isGuideOpen = !isGuideOpen;
 				break;
 			case 'a':
 				ev.preventDefault();
 				if (isGuideOpen) {
 					isGuideOpen = false;
 				}
-				isAboutOpen = true;
+				isAboutOpen = !isAboutOpen;
 				break;
 			case 'c':
 				ev.preventDefault();
@@ -139,25 +142,11 @@
 		>
 	</div>
 	<Modal bind:open={isGuideOpen} heading="Guide">
-		<p>This app is a minimal interface for constructing custom CSS cubic-beziers.</p>
-		<br />
 		<p>
-			On the left side is the graph, a cartesian system with hooks that you can move around with
-			your pointing device to manipulate the shape of the curve. Underneath that is a group of
-			number inputs that can also be used to do more precise geometry.
+			This app has a minimal interface for constructing custom CSS cubic-beziers. Let's run through
+			some parts of it.
 		</p>
-		<br />
-		<p>
-			On the right is a code output that displays what your easing curve will look like, and a copy
-			button to easily take it and add it to your code.
-		</p>
-		<br />
-		<p>
-			Underneath the code output is the preview section, where you can preview a sample animation
-			that uses the values of your constructed curve to show how it would look like in select modes
-			and running at certain durations.
-		</p>
-		<br />
+		{@render InterfaceWalkthrough()}
 		<p>
 			I'm working to create a library of easings, with a great set of defaults. You will also be
 			able to add your own custom-made easings. All saved locally in your browser.
@@ -213,11 +202,7 @@
 
 <div class="non-desktop-overlay">
 	<h2 class="h1 heading">Apologies!</h2>
-	<p>
-		This app is currently unable to be used on non-desktop devices
-		<!-- with a screen less than 1034px
-		wide. -->
-	</p>
+	<p>This app is currently unavailable on devices with a screen width less than 1034px.</p>
 </div>
 
 {#snippet Graph()}
@@ -382,6 +367,52 @@
 	</section>
 {/snippet}
 
+{#snippet InterfaceWalkthrough()}
+	<div class="interface-walkthrough">
+		<!-- The Graph -->
+		<details class="the-graph" open>
+			<summary>The graph</summary>
+			<div class="screenie">
+				<img src={graphScreenie} alt="Screenshot of the graph interface" />
+			</div>
+			<div class="contents">
+				<p>
+					On the left side is the graph, a cartesian system with handles that you can move around
+					with your pointing device to manipulate the shape of the curve. Underneath that is a group
+					of number inputs that can also be used to do more precise geometry.
+				</p>
+			</div>
+		</details>
+		<!-- The Code Output -->
+		<details class="the-code-output">
+			<summary>The code output</summary>
+			<div class="screenie">
+				<img src={codeOutputScreenie} alt="Screenshot of the code output interface" />
+			</div>
+			<div class="contents">
+				<p>
+					On the right is a code output that displays what your easing curve will look like, and a
+					copy button to easily take it and add it to your code.
+				</p>
+			</div>
+		</details>
+		<!-- The Animation Preview -->
+		<details class="the-preview">
+			<summary>The preview</summary>
+			<div class="screenie">
+				<img src={animationPreviewScreenie} alt="Screenshot of the preview interface" />
+			</div>
+			<div class="contents">
+				<p>
+					Underneath the code output is the preview section, where you can preview a sample
+					animation that uses the values of your constructed curve to show how it would look like in
+					select modes and running at certain durations.
+				</p>
+			</div>
+		</details>
+	</div>
+{/snippet}
+
 <style>
 	.non-desktop-overlay {
 		display: none;
@@ -395,6 +426,53 @@
 		background-color: var(--color-white);
 		position: sticky;
 		top: 0;
+	}
+
+	.interface-walkthrough {
+		display: grid;
+		border: 1px solid var(--color-neutral-100);
+		margin-block: 1em;
+
+		> details {
+			> summary {
+				list-style: none;
+				text-transform: uppercase;
+				padding: 12px;
+				position: relative;
+				cursor: pointer;
+
+				&::after {
+					content: '+';
+					font-size: var(--text-md);
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					position: absolute;
+					inset-block: 0;
+					inset-inline-end: 12px;
+					margin-block: auto;
+				}
+			}
+			> .screenie {
+				border-block: 1px solid var(--color-neutral-100);
+			}
+			> .contents {
+				padding: 12px;
+			}
+
+			&:not(:nth-child(1)) {
+				border-block-start: 1px solid var(--color-neutral-100);
+			}
+			&[open] {
+				> summary {
+					background-color: var(--color-neutral-50);
+
+					&::after {
+						content: '-';
+					}
+				}
+			}
+		}
 	}
 
 	main {
