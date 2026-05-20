@@ -85,7 +85,7 @@
 
 	article.card {
 		width: 100%;
-		max-width: 600px;
+		max-width: 400px;
 		max-height: 100%;
 		border: 1px solid var(--color-neutral-100);
 		background-color: var(--color-white);
