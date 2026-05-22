@@ -4,9 +4,18 @@
 	import BezierGraph from '$components/Graph/BezierGraph.svelte';
 	import Modal from '$components/overlays/Modal.svelte';
 	// import GraphInput from '$components/Graph/GraphInput.svelte';
-	import graphScreenie from '$lib/assets/graph-screenie.jpg';
-	import codeOutputScreenie from '$lib/assets/code-output-screenie.jpg';
-	import animationPreviewScreenie from '$lib/assets/animation-preview-screenie.jpg';
+	import ogImage from '$lib/assets/images/og-image.png';
+	import graphScreenie from '$lib/assets/images/graph-screenie.jpg';
+	import codeOutputScreenie from '$lib/assets/images/code-output-screenie.jpg';
+	import animationPreviewScreenie from '$lib/assets/images/animation-preview-screenie.jpg';
+	// Ratchet audio samples
+	import ratchetOne from '$lib/assets/audio/ratchet/sample-1.ogg';
+	import ratchetTwo from '$lib/assets/audio/ratchet/sample-2.ogg';
+	import ratchetThree from '$lib/assets/audio/ratchet/sample-3.ogg';
+	import ratchetFour from '$lib/assets/audio/ratchet/sample-4.ogg';
+	import ratchetFive from '$lib/assets/audio/ratchet/sample-5.ogg';
+	import btnClickFx from '$lib/assets/audio/other/btn-click.ogg';
+	import Logo from '$components/icons/Logo.svelte';
 
 	/** @type { GraphCoords } */
 	let graphCoords = $state({
@@ -49,6 +58,30 @@
 	/** @type { boolean } */
 	let isAboutOpen = $state(false);
 
+	function playRatchet() {
+		const random = Math.floor(Math.random() * 5);
+		// console.log(random);
+		/** @type { HTMLAudioElement | null } */
+		const ratchetSample = document.querySelector(`audio.ratchet-${random}`);
+		// console.log(ratchetSample);
+
+		if (ratchetSample) {
+			ratchetSample.volume = 0.4;
+			ratchetSample.play();
+		}
+	}
+
+	function playBtnClick() {
+		/** @type { HTMLAudioElement | null } */
+		const btnClick = document.querySelector(`audio.btn-click`);
+		// console.log(btnClick);
+
+		if (btnClick) {
+			// btnClick.volume = 0.2;
+			btnClick.play();
+		}
+	}
+
 	function copyCode() {
 		if (browser) {
 			if (isCodeCopied) {
@@ -58,14 +91,11 @@
 				`cubic-bezier(${bezierCoords.p1.x}, ${bezierCoords.p1.y}, ${bezierCoords.p2.x}, ${bezierCoords.p2.y})`
 			);
 			isCodeCopied = true;
+			playBtnClick();
 			setTimeout(() => {
 				isCodeCopied = false;
 			}, 2000);
 		}
-	}
-
-	function updateCoords() {
-		inputCoords = bezierCoords;
 	}
 
 	/** @type { () => void } */
@@ -112,6 +142,11 @@
 		}
 	}
 
+	function updateCoords() {
+		inputCoords = bezierCoords;
+		playRatchet();
+	}
+
 	onMount(() => {
 		inputCoords = bezierCoords;
 	});
@@ -119,13 +154,35 @@
 
 <svelte:head>
 	<title>Eazier - CSS Cubic Bezier Generator</title>
+	<meta
+		name="description"
+		content="The minimal app for creating custom cubic-bezier easing curves"
+	/>
+	<!-- Opengraph -->
+	<meta property="og:title" content="Eazier" />
+	<meta
+		property="og:description"
+		content="The minimal app for creating custom cubic-bezier easing curves"
+	/>
+	<meta property="og:image" content={ogImage} />
+	<!-- Twitter -->
+	<meta property="twitter:title" content="Eazier" />
+	<meta
+		property="twitter:description"
+		content="The minimal app for creating custom cubic-bezier easing curves"
+	/>
+	<meta property="twitter:image" content={ogImage} />
+	<meta property="twitter:card" content="summary_large_image" />
 </svelte:head>
 
 <svelte:window onkeydown={handleKeyboardShortcuts} />
 
 <header>
 	<div class="side start">
-		<h1 class="h5">Eazier</h1>
+		<div class="logo-container">
+			<Logo size="var(--text-lg)" />
+			<span class="h6">Eazier</span>
+		</div>
 	</div>
 	<div class="side end">
 		<button
@@ -198,6 +255,7 @@
 			<!-- {@render Library()} -->
 		</div>
 	</div>
+	<audio src={btnClickFx} class="btn-click"></audio>
 </main>
 
 <div class="non-desktop-overlay">
@@ -212,12 +270,6 @@
 		</div>
 		<!-- BEZIER GRAPH -->
 		<BezierGraph bind:coords={graphCoords} update={updateCoords} />
-		<!-- <div class="positions">
-					<p>
-						Graph coords: x1 {bezierCoords.p1.x}, y1 {bezierCoords.p1.y}, x2 {bezierCoords.p2.x}, y2 {bezierCoords
-							.p2.y}
-					</p>
-				</div> -->
 		<div class="input-controls">
 			<div class="labels">
 				<label for="x1">x1</label>
@@ -268,6 +320,11 @@
 				/>
 			</div>
 		</div>
+		<audio src={ratchetOne} class="ratchet-1"></audio>
+		<audio src={ratchetTwo} class="ratchet-2"></audio>
+		<audio src={ratchetThree} class="ratchet-3"></audio>
+		<audio src={ratchetFour} class="ratchet-4"></audio>
+		<audio src={ratchetFive} class="ratchet-5"></audio>
 	</section>
 {/snippet}
 
@@ -329,6 +386,7 @@
 				class="btn"
 				class:swap={isAnimationPlaying}
 				onclick={() => {
+					playBtnClick();
 					isAnimationPlaying = !isAnimationPlaying;
 				}}
 			>
@@ -426,6 +484,25 @@
 		background-color: var(--color-white);
 		position: sticky;
 		top: 0;
+
+		.side {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.logo-container {
+			display: flex;
+			justify-content: flex-start;
+			align-items: center;
+			gap: 8px;
+
+			> span {
+				font-weight: 800;
+				text-transform: uppercase;
+			}
+		}
 	}
 
 	.interface-walkthrough {
@@ -434,12 +511,20 @@
 		margin-block: 1em;
 
 		> details {
+			background-color: var(--color-white);
+			isolation: isolate;
+
 			> summary {
 				list-style: none;
 				text-transform: uppercase;
 				padding: 12px;
 				position: relative;
 				cursor: pointer;
+				outline: 2px solid transparent;
+
+				&:focus-visible {
+					outline-color: var(--color-neutral-800);
+				}
 
 				&::after {
 					content: '+';
