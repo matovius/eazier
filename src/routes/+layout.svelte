@@ -2,7 +2,7 @@
 	import '@fontsource/dm-mono/400';
 	import '@fontsource/dm-mono/500';
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/images/favicon.svg';
 
 	/**
 	 * @typedef Props
