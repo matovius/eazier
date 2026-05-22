@@ -56,7 +56,8 @@
 				p1.y = 500;
 			}
 
-			coords.p1 = p1Control.position = p1;
+			p1Control.position = p1;
+			coords.p1 = p1;
 			update();
 		}
 	}
@@ -82,7 +83,8 @@
 				p2.y = 500;
 			}
 
-			coords.p2 = p2Control.position = p2;
+			p2Control.position = p2;
+			coords.p2 = p2;
 			update();
 		}
 	}
