@@ -103,6 +103,7 @@
 			background-color: var(--color-white);
 			position: sticky;
 			top: 0;
+			z-index: 1;
 
 			> .heading {
 				text-transform: uppercase;
